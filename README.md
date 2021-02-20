@@ -5,19 +5,19 @@ SOAP requests with Node.js
 
  
  These days, when we think of interfaces that provide services to
-clients and/or developers, we usually think of REST. But before there
-was REST, there were other architectures such as SOAP and XML-RPC.
+clients and/or developers, we usually think of **REST**. But before there
+was REST, there were other architectures such as **SOAP** and **XML-RPC**.
 
 
- SOAP stands for Simple Object Access Protocol. It's an API based on
+**SOAP** stands for **Simple Object Access Protocol**. It's an API based on
 XML. And despite being in disuse, there may be occasions when you need
 to consume a service that uses it. Where? Well, usually in business or
 government environments that seem to be trapped in some kind of time
 vortex.
 
 
- A SOAP interface is defined using WSDL (Web Services Description
-Language) which is an XML-based dialect. A WSDL document provides the
+A SOAP interface is defined using **WSDL (Web Services Description
+Language)** which is an XML-based dialect. A WSDL document provides the
 necessary information to the client to interact with the Web service. 
  
  
@@ -25,7 +25,7 @@ necessary information to the client to interact with the Web service.
 Here is an example:
 
 
-```bash 
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:VNifV2Ent="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Ent.xsd" targetNamespace="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Ent.xsd" elementFormDefault="qualified">
 	<annotation>
@@ -65,7 +65,7 @@ Here is an example:
 
  
 
-To consume a SOAP API, we need to send it a POST request containing 2
+To consume a **SOAP API**, we need to send it a POST request containing 2
 things:
 
 - The appropriate headers
@@ -110,7 +110,7 @@ about requests that don't have this header. For example:
 
  
 
-The SOAP envelope defines the framework that determines what can be
+The **SOAP envelope** defines the framework that determines what can be
 entered into a message, who should enter it and whether that operation
 is optional or mandatory. It can be considered the payload of the
 service. We are going to use an open source tool called
@@ -127,7 +127,7 @@ files with .wsdl and .xsd extension) or via a URL.
  
 
 
- Of course the first thing we need is a service to consume. For example
+ Of course the first thing we need is **a service to consume**. For example
 the one we can find at
 [https://www.dataaccess.com/webservicesserver/NumberConversion.wso?wsdl](https://www.dataaccess.com/webservicesserver/NumberConversion.wso?wsdl)
  
@@ -207,8 +207,8 @@ response. And if we explore both in their raw form we will see...
 
  
 
-### Testing the service with Postman 
-
+**Testing the service with Postman** 
+-----------------------------------
 
  
 

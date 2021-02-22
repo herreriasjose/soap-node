@@ -27,7 +27,9 @@ Here is an example:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:VNifV2Ent="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Ent.xsd" targetNamespace="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Ent.xsd" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:VNifV2Ent="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Ent.xsd" targetNamespace=
+   "http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Ent.xsd"
+ elementFormDefault="qualified">
 	<annotation>
 		<documentation>
     		Esquema para solicitar la verificación de un NIF
@@ -144,7 +146,7 @@ and enter its url:
 
  
 
- ![](images/01.png)
+ ![](images/01.jpg)
  
 
  

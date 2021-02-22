@@ -59,6 +59,7 @@ targetNamespace= "http://www2.agenciatributaria.gob.es/static_files/common/inter
 ```
 
  
+ ---
 
 
  
@@ -76,7 +77,7 @@ things:
 - An XML format fragment called SOAP envelope
 
 
- 
+
 
 **The headers**
 
@@ -102,10 +103,7 @@ about requests that don't have this header. For example:
 
 `user-agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/535.19 (KHTML, como Gecko) Chrome/18.0.1025.151 Safari/535.19"`
 
-
  
-
-
  
 
 **The SOAP Envelope**
@@ -124,9 +122,12 @@ payloads.
  You can enter a WSDL in SOAPUI via local files (usually a group of
 files with .wsdl and .xsd extension) or via a URL.
  
+ ---
+ &nbsp;&nbsp;
+
  
  **A first example**
- 
+ &nbsp;&nbsp;
  
 
 
@@ -149,73 +150,57 @@ and enter its url:
 
  ![](images/01v2.jpg)
  
-
+&nbsp;&nbsp;
  
 
 Note that by default it will generate "SOAP Bindings" for all options
 provided by the service.
+
+&nbsp;&nbsp;
 
  ![](images/02.png)
  
  
 
  
+&nbsp;&nbsp;
 
 These are standard XML schemas for the SOAP web service to consume. All
 you have to do is fill in the data and replace the ? signs with
 acceptable data for the service to consume. For example, the number 31.
 
+&nbsp;&nbsp;
 
 ![](images/03.png) 
  
  
+&nbsp;&nbsp;
 
 Notice that on the left we have the request and on the right the
 response. And if we explore both in their raw form we will see...
 
+&nbsp;&nbsp;
 
  
  ![](images/04.png)
  
-
-
  
-
-
  
-
-
- 
-
-
- 
-
-
- 
-
-
- 
-
-
- 
-
-
- 
+&nbsp;&nbsp;
 
 ...the complete request with its headers and the response received.
 
 
  
+---
 
-
+&nbsp;&nbsp;
  
 
 **Testing the service with Postman** 
 -----------------------------------
 
- 
-
-
+  
  
 
 TODO

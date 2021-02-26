@@ -127,6 +127,8 @@ files with .wsdl and .xsd extension) or via a URL.
 
  
  **A first example**
+ -------------------
+
  &nbsp;&nbsp;
  
 
@@ -148,7 +150,7 @@ and enter its url:
 
  
 
- ![](images/01v2.jpg)
+ ![](images/01.jpg)
  
 &nbsp;&nbsp;
  
@@ -197,14 +199,137 @@ response. And if we explore both in their raw form we will see...
 &nbsp;&nbsp;
  
 
-**Testing the service with Postman** 
------------------------------------
-
-  
+**Consuming SOAP using Node**
+-----------------------------
  
+&nbsp;&nbsp;
+ 
+It is true that there are modules to consume SOAP from Node, but in an attempt to better understand how it works and given that all you have to send is a few headers and a payload we are going to create a module that will do it without any middlemen. We will call this file soaprequest.js and it will contain...
 
+```javascript
+const axios = require('axios-https-proxy-fix');
+module.exports = function soapRequest(opts = {
+  url: '',
+  headers: {},
+  xml: '',
+  timeout: 10000,
+  proxy: false,
+}) {
+  const {
+    url,
+    headers,
+    xml,
+    timeout,
+    proxy,
+  } = opts;
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'post',
+      url,
+      headers,
+      data: xml,
+      timeout,
+      proxy,
+    }).then((response) => {
+      resolve({
+        response: {
+          headers: response.headers,
+          body: response.data,
+          statusCode: response.status,
+        },
+      });
+    }).catch((e) => {
+      if (e.response) {
+        console.error(`${e}`);
+        reject(e.response.data);
+      } else {
+        console.error(`${e}`);
+        reject(e);
+      }
+    });
+  });
+};
+```
+
+We need the envelope of the NumberToWords soapAction that we obtained in the previous section using SoapUI and we are going to paste it in a file. We will call the file numbertoworld.xml and its content is:
+
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.dataaccess.com/webservicesserver/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <web:NumberToWords>
+         <web:ubiNum>31</web:ubiNum>
+      </web:NumberToWords>
+   </soapenv:Body>
+</soapenv:Envelope>
+```
+
+Now to use it with the previous example we create the index.js file with the following content...
+
+```javascript
+const soapRequest = require('./soaprequest');
+const fs = require('fs');
+
+// example data
+const url = 'https://www.dataaccess.com/webservicesserver/NumberConversion.wso';
+const headersToAdd = {
+  'user-agent': '',
+  'Content-Type': 'text/xml;charset=UTF-8',
+  'soapAction': '',
+};
+const xml = fs.readFileSync('numbertoworld.xml', 'utf-8');
+
+// usage of module
+(async () => {
+  const { response } = await soapRequest({ url: url, headers: headersToAdd, xml: xml, timeout: 1000 }); // Optional timeout parameter(milliseconds)
+  const { headers, body, statusCode } = response;
+  console.log(headers);
+  console.log(body);
+  console.log(statusCode);
+})();
+```
+
+We must not forget to install the module: 
+
+```bash
+$ npm i axios-https-proxy-fix
+```
+And if we run the script:
+
+```bash
+$ node index.js
+```
+
+We will have the answer to our request:
+
+```javascript
+{
+  'cache-control': 'private, max-age=0',
+  'content-length': '343',
+  'content-type': 'text/xml; charset=utf-8',
+  server: 'Server',
+  'web-service': 'DataFlex 19.1',
+  'access-control-allow-origin': 'http://www.dataaccess.com',
+  'access-control-allow-methods': 'GET, POST',
+  'access-control-allow-headers': 'content-type',
+  'access-control-allow-credentials': 'true',
+  'strict-transport-security': 'max-age=31536000',
+  date: 'Fri, 26 Feb 2021 19:54:50 GMT',
+  connection: 'close'
+}
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <m:NumberToWordsResponse xmlns:m="http://www.dataaccess.com/webservicesserver/">
+      <m:NumberToWordsResult>thirty one </m:NumberToWordsResult>
+    </m:NumberToWordsResponse>
+  </soap:Body>
+</soap:Envelope>
+200
+```
+ 
+**Consuming SOAP requiring certificates using Node**
+----------------------------------------------------
+&nbsp;&nbsp;
+&nbsp;&nbsp;
 TODO
-
-
- 
-

@@ -330,6 +330,123 @@ We will have the answer to our request:
  
 **Consuming SOAP requiring certificates using Node**
 ----------------------------------------------------
+
+
+Let's say we need to consume a SOAP service that requests a **digital certificate**, for example to check a NIF number of the Spanish Tax Agency (Agencia Estatal de Administración Tributaria).
+
+The SOAP service can be found at: https://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2.wsdl
+
+If we add the URL to SoapUI we will see:
 &nbsp;&nbsp;
+
+ ![](images/05.png)
 &nbsp;&nbsp;
-TODO
+
+ Now we add the certificate along with its password with which it was exported to SoapUI in File → Preferences → SSL Settings. 
+&nbsp;&nbsp;
+
+ ![](images/06.png)
+&nbsp;&nbsp;
+
+ If we modify the data of the request including a NIF number (in this example we are using the one of the company Iberdrola) and its valid user and we send it to the service...
+&nbsp;&nbsp;
+
+  ![](images/07.png)
+&nbsp;&nbsp;
+
+  ...we get the response from the SOAP service. Observe now the **raw request** that is made and from which we can extract the envelope:
+&nbsp;&nbsp;
+
+  ![](images/08.png)
+&nbsp;&nbsp;
+
+  Let's do it now using Node. For this we create the *index_certificate.js* file using the URL, NIF data and envelope we have obtained from SoapUI:
+
+  ```javascript
+  "use strict";
+const soapRequest = require('./soaprequest');
+const url = 'https://www1.agenciatributaria.gob.es/wlpl/BURT-JDIT/ws/VNifV2SOAP';
+const headersToAdd = {
+  'user-agent': '',
+  'Content-Type': 'text/xml;charset=UTF-8',
+  'soapAction': '',
+};
+const nif = 'A95758389';
+const name= 'Iberdrola';
+
+async function verifyNif(nif, name) { 
+const xml = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vnif="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Ent.xsd">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <vnif:VNifV2Ent>
+         <!--1 to 20000 repetitions:-->
+         <vnif:Contribuyente>
+            <vnif:Nif>${nif}</vnif:Nif>
+            <vnif:Nombre>${name}</vnif:Nombre>
+         </vnif:Contribuyente>
+      </vnif:VNifV2Ent>
+   </soapenv:Body>
+   </soapenv:Envelope>`;
+    const { response } = await soapRequest({ url: url, headers: headersToAdd, xml: xml, timeout: 2000 });
+    const { headers, body, statusCode } = response;
+    console.log(body);
+}
+
+verifyNif(nif, name); 
+```
+
+We slightly modify the *soaprequest.js* file to include an **agent object** containing the certificate (do not forget to include it in the folder):
+
+```javascript
+"use strict";
+
+const axios = require('axios-https-proxy-fix');
+const https = require('https');
+const fs = require('fs');
+
+module.exports = function soapRequest(opts = {
+  url: '',
+  headers: {},
+  xml: '',
+  timeout: 10000,
+  proxy: false
+}) {
+  const { url, headers, xml, timeout, proxy} = opts;
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'post',
+      url,
+      headers,
+      data: xml,
+      timeout,
+      proxy,
+      httpsAgent: new https.Agent({
+        pfx: fs.readFileSync('cert.pfx'),
+        passphrase: '1234567'
+      })
+    }).then((response) => {
+      resolve({
+        response: {
+          headers: response.headers,
+          body: response.data,
+          statusCode: response.status,
+        },
+      });
+    }).catch((error) => {
+      if (error.response) {
+        console.error(`SOAP FAIL: ${error}`);
+        reject(error.response.data);
+      } else {
+        console.error(`SOAP FAIL: ${error}`);
+        reject(error);
+      }
+    });
+  });
+};
+```
+
+And the result...
+
+```bash
+<?xml version="1.0" encoding="UTF-8"?><env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><env:Body><VNifV2Sal:VNifV2Sal xmlns:VNifV2Sal="http://www2.agenciatributaria.gob.es/static_files/common/internet/dep/aplicaciones/es/aeat/burt/jdit/ws/VNifV2Sal.xsd"><VNifV2Sal:Contribuyente><VNifV2Sal:Nif>A95758389</VNifV2Sal:Nif><VNifV2Sal:Nombre>IBERDROLA CLIENTES SA</VNifV2Sal:Nombre><VNifV2Sal:Resultado>IDENTIFICADO</VNifV2Sal:Resultado></VNifV2Sal:Contribuyente></VNifV2Sal:VNifV2Sal></env:Body></env:Envelope>
+```

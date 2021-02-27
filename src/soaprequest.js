@@ -1,18 +1,18 @@
+
+"use strict";
+
 const axios = require('axios-https-proxy-fix');
+const https = require('https');
+const fs = require('fs');
+
 module.exports = function soapRequest(opts = {
   url: '',
   headers: {},
   xml: '',
   timeout: 10000,
-  proxy: false,
+  proxy: false
 }) {
-  const {
-    url,
-    headers,
-    xml,
-    timeout,
-    proxy,
-  } = opts;
+  const { url, headers, xml, timeout, proxy} = opts;
   return new Promise((resolve, reject) => {
     axios({
       method: 'post',
@@ -21,6 +21,10 @@ module.exports = function soapRequest(opts = {
       data: xml,
       timeout,
       proxy,
+      httpsAgent: new https.Agent({
+        pfx: fs.readFileSync('cert.pfx'),
+        passphrase: '1234567'
+      })
     }).then((response) => {
       resolve({
         response: {
@@ -29,13 +33,13 @@ module.exports = function soapRequest(opts = {
           statusCode: response.status,
         },
       });
-    }).catch((e) => {
-      if (e.response) {
-        console.error(`${e}`);
-        reject(e.response.data);
+    }).catch((error) => {
+      if (error.response) {
+        console.error(`SOAP FAIL: ${error}`);
+        reject(error.response.data);
       } else {
-        console.error(`${e}`);
-        reject(e);
+        console.error(`SOAP FAIL: ${error}`);
+        reject(error);
       }
     });
   });
